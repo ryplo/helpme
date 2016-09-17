@@ -3,7 +3,8 @@ import os
 pypd.api_key = "xx3gyxWCgxhQtvxs1K6B"
 # find incidents, resolve the unresolvd ones.
 
-triggered = False
+# triggered = False
+# while True:
 if True: # if Sensor.fall == True
     pypd.Event.create(data={
         'service_key': '266cc74b1bef4ad8be210d0819a436f8',
@@ -17,9 +18,6 @@ if True: # if Sensor.fall == True
               },
         ],
     })
-    triggered = True
+triggered = True
 while triggered == True:
-    file = ' /Users/rachello/dev/helpme/beep-05.wav'
-    os.system ('mplayer' + file)
-    if True:
-        triggered = False
+    os.system ("omxplayer beep-05.wav")
