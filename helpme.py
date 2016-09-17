@@ -18,6 +18,4 @@ if True: # if Sensor.fall == True
               },
         ],
     })
-triggered = True
-while triggered == True:
     os.system ("omxplayer beep-05.wav")
