@@ -7,8 +7,15 @@ import time
 import math
 import os
 import pypd
+import requests
 import RPi.GPIO as GPIO
 pypd.api_key = "xx3gyxWCgxhQtvxs1K6B"
+headers = {
+"Content-Type": "application/json",
+"Accept": "application/vnd.pagerduty+json;version=2",
+"From": "lo.rachel8@gmail.com",
+"Authorization": "Token token=xx3gyxWCgxhQtvxs1K6B"
+}
 
 # pin for switch
 GPIO.setmode(GPIO.BCM)
@@ -40,7 +47,7 @@ else:
 # this is a good time to set any fusion parameters
 
 imu.setSlerpPower(0.02)
-imu.setGyroEnable(True) 
+imu.setGyroEnable(True)
 imu.setAccelEnable(True)
 imu.setCompassEnable(True)
 
@@ -64,7 +71,7 @@ while True:
         accel = data["accel"]
 
         # Waiting for fall to happen
-        
+
         if abs(accel[0])>highThreshold or abs(accel[1])>highThreshold or abs(accel[2])>highThreshold:
           # Once fall occurs, create incident
           beginTime=time.clock()
@@ -85,7 +92,7 @@ while True:
             imu.IMURead()
             data = imu.getIMUData()
             accel = data["accel"]
-            print("r: %f p: %f y: %f" % ((accel[0]), 
+            print("r: %f p: %f y: %f" % ((accel[0]),
             (accel[1]), (accel[2])))
             os.system ("omxplayer beep-07.wav")
             time.sleep(poll_interval*1.0/1000.0)
@@ -93,14 +100,18 @@ while True:
           endTime=time.clock()
           elapsedTime=endTime-beginTime
           open_incident = pypd.Incident.find_one(statuses=["triggered"])
-          pypd.Incident.create_note(open_incident, name + " got back up")
+          open_id = str(open_incident.get('id'))
+          url = 'https://api.pagerduty.com/incidents/' + open_id + '/notes'
+          payload = '{"note": {"content": "' + name + ' seems to have gotten back up on their feet"}}'
+          requests.post(url, data=payload, headers=headers)
+
           pypd.Incident.resolve(open_incident, "lo.rachel8@gmail.com")
           #Patient is alive, create new incident
 
           pypd.Event.create(data={
             'service_key': 'c7f3b642055b4a76b875a4072e9f945e',
             'event_type': 'trigger',
-             'description':name + 'has gotten up',
+            'description':name + 'has gotten up',
             'contexts': [
                   {
                       'type': 'link',
@@ -110,7 +121,9 @@ while True:
             ],
           })
           open_low_incident = pypd.Incident.find_one(statuses=["triggered"])
-          pypd.Incident.create_note(open_low_incident, name + " recently fell and should be checked up on")
-          
-        time.sleep(poll_interval*1.0/1000.0)
+          open_low_id = str(open_low_incident.get('id'))
+          url = 'https://api.pagerduty.com/incidents/' + open_low_id + '/notes'
+          payload = '{"note": {"content": "' + name + ' may have recently experienced a fall and should be checked up on"}}'
 
+          requests.post(url, data=payload, headers=headers)
+        time.sleep(poll_interval*1.0/1000.0)
