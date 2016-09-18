@@ -1,7 +1,17 @@
 import pypd
 import os
+import RPi.GPIO as GPIO
+
 pypd.api_key = "xx3gyxWCgxhQtvxs1K6B"
-# find incidents, resolve the unresolvd ones.
+
+# pin for switch
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(4, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+# upon startup, resolve all unresolved incidents
+open_incidents = pypd.Incident.find(statuses=["triggered"])
+for incident in open_incidents
+    pypd.Incident.resolve(incident, "lo.rachel8@gmail.com")
 
 # triggered = False
 # while True:
@@ -19,5 +29,7 @@ if True: # if Sensor.fall == True
         ],
     })
 triggered = True
-while triggered == True:
+while (GPIO.input(4) == 1):
     os.system ("omxplayer beep-05.wav")
+open_incidents = pypd.Incident.find(statuses=["triggered"])
+pypd.Incident.resolve(incident, "lo.rachel8@gmail.com")
