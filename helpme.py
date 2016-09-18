@@ -10,7 +10,7 @@ GPIO.setup(4, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 # upon startup, resolve all unresolved incidents
 open_incidents = pypd.Incident.find(statuses=["triggered"])
-for incident in open_incidents
+for incident in open_incidents:
     pypd.Incident.resolve(incident, "lo.rachel8@gmail.com")
 
 # triggered = False
