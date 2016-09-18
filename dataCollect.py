@@ -30,7 +30,7 @@ imu.setGyroEnable(True)
 imu.setAccelEnable(True)
 imu.setCompassEnable(True)
 
-f = open('Walking.csv',"w")
+f = open('Falling.csv',"w")
 
 poll_interval = imu.IMUGetPollInterval()
 print("Recommended Poll Interval: %dmS\n" % poll_interval)
